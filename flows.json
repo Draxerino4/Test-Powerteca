@@ -1,0 +1,36 @@
+[
+    {
+        "name": "Flow 1 - User details extraction",
+        "description": "Este fluxo é um fluxo de exemplo",
+        "instructions": "Test instruções\n2. Algo",
+        "tabs": [
+            {
+                "tabName": "API tab",
+                "file": "flows/Flow 1 - User details extraction/API tab.txt",
+                "description": "FUNCTION Api_Tab GLOBAL"
+            },
+            {
+                "tabName": "Main tab",
+                "file": "flows/Flow 1 - User details extraction/Main tab.txt",
+                "description": "FUNCTION Main_cópia GLOBAL"
+            }
+        ]
+    },
+    {
+        "name": "Flow 2 - Web Automation Login",
+        "description": "",
+        "instructions": "",
+        "tabs": [
+            {
+                "tabName": "Advanced",
+                "file": "flows/Flow 2 - Web Automation Login/Advanced.txt",
+                "description": ""
+            },
+            {
+                "tabName": "Login",
+                "file": "flows/Flow 2 - Web Automation Login/Login.txt",
+                "description": ""
+            }
+        ]
+    }
+]

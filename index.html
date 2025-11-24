@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Powerteca</title>
+
+<style>
+    :root {
+        --bg: #f4f5f7;
+        --card-bg: white;
+        --text: #000;
+        --secondary: #555;
+        --header-bg: #C60D25;
+        --pre-bg: #272822;
+        --pre-text: #f8f8f2;
+        --comment-bg: #f9f9f9;
+        --comment-border: #e0e0e0;
+        --instruction-bg: #f0f8ff;
+        --instruction-border: #b0d4f1;
+    }
+
+    body.dark {
+        --bg: #1e1e1e;
+        --card-bg: #2c2c2c;
+        --text: #f5f5f5;
+        --secondary: #cccccc;
+        --header-bg: #722f37;
+        --pre-bg: #111;
+        --pre-text: #eee;
+        --comment-bg: #333;
+        --comment-border: #555;
+        --instruction-bg: #2a3f5f;
+        --instruction-border: #4a5f7f;
+    }
+
+    body { 
+        margin:0; 
+        font-family:Arial; 
+        background:var(--bg); 
+        color:var(--text);
+        transition:0.3s background, 0.3s color;
+    }
+
+    header {
+        background:var(--header-bg);
+        padding:15px 25px;
+        color:white;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        flex-wrap:wrap;
+    }
+
+    .header-left {
+        display:flex;
+        align-items:center;
+        gap:15px;
+    }
+
+    #logoArea {
+        width:140px;
+        height:40px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:white;
+        border:1px solid rgba(255,255,255,0.3);
+        border-radius:5px;
+        font-weight:bold;
+    }
+
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .site-title {
+        color: white;
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 18px;
+    }
+
+    #searchBox {
+        width:100%;
+        padding:8px;
+        font-size:15px;
+        border-radius:5px;
+        border:none;
+    }
+
+    #langSelector, #darkModeToggle {
+        padding:8px;
+        border-radius:5px;
+        font-size:15px;
+    }
+
+    .container { padding:25px; }
+
+    .flow-card {
+        background:var(--card-bg);
+        padding:20px;
+        margin-bottom:25px;
+        border-radius:12px;
+        box-shadow:0 2px 5px rgba(0,0,0,0.12);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s;
+        position: relative;
+        cursor: pointer;
+    }
+
+    /* --- NEW: Hover effect for the flow card --- */
+    .flow-card:hover {
+        transform: scale(1.01); /* Zooms in the card slightly */
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Adds a larger shadow for a "float" effect */
+        z-index: 1; /* Ensures the hovered card is on top of others */
+    }
+
+    .flow-title { font-size:22px; font-weight:bold; }
+    .flow-desc { font-size:14px; margin-bottom:12px; color:var(--secondary); }
+
+    .tabs { display:flex; border-bottom:2px solid #ddd; margin-top:15px; }
+    .tab {
+        padding:10px 20px;
+        cursor:pointer;
+        border-bottom:3px solid transparent;
+    }
+    .tab.active {
+        border-color:#1e90ff;
+        font-weight:bold;
+    }
+
+    .code-container {
+        position: relative;
+        margin-top: 15px;
+    }
+
+    .code-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .code-toggle-btn {
+        padding:5px 10px;
+        background:#1e90ff;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+        font-size:12px;
+    }
+
+    pre {
+        background:var(--pre-bg);
+        color:var(--pre-text);
+        padding:15px;
+        border-radius:6px;
+        overflow-x:auto;
+        max-height: 500px;
+        display: none;
+    }
+
+    pre.expanded {
+        display: block;
+    }
+
+    .copy-btn {
+        padding:7px 14px;
+        background:#1e90ff;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+        margin-top:10px;
+    }
+
+    /* Instructions section styles */
+    .instructions-section {
+        margin-top: 15px;
+        display: none;
+        padding: 15px;
+        background: var(--instruction-bg);
+        border: 1px solid var(--instruction-border);
+        border-radius: 6px;
+    }
+
+    .instructions-section.active {
+        display: block;
+    }
+
+    .instructions-header {
+        font-weight: bold;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .instructions-content {
+        white-space: pre-wrap;
+    }
+
+    .instructions-btn {
+        padding:5px 10px;
+        background:#4CAF50;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+        font-size:12px;
+        margin-top: 10px;
+    }
+
+    /* Comments section styles */
+    .comments-section {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid var(--comment-border);
+    }
+
+    .comments-header {
+        font-weight: bold;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .comment-form {
+        margin-bottom: 15px;
+        display: none;
+    }
+
+    .comment-form.active {
+        display: block;
+    }
+
+    .comment-name-input, .comment-input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid var(--comment-border);
+        background: var(--comment-bg);
+        color: var(--text);
+        box-sizing: border-box; /* Ensures padding doesn't affect width */
+    }
+
+    .comment-name-input {
+        margin-bottom: 10px;
+    }
+    
+    .comment-input {
+        margin-bottom: 10px;
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    .comment-submit {
+        padding: 8px 15px;
+        background: #1e90ff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .comment-cancel {
+        padding: 8px 15px;
+        background: #888;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+
+    .comments-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .comment {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        background: var(--comment-bg);
+        border: 1px solid var(--comment-border);
+    }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-size: 12px;
+        color: var(--secondary);
+    }
+
+    .comment-author {
+        font-weight: bold;
+    }
+
+    .comment-text {
+        white-space: pre-wrap;
+    }
+
+    .no-comments {
+        color: var(--secondary);
+        font-style: italic;
+    }
+
+    .add-comment-btn {
+        padding: 5px 10px;
+        background: #1e90ff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-left">
+        <img src="isqe-logo.png" alt="isqe" style="width:100px;height:50px;">
+        <div class="search-container">
+            <div class="site-title">Powerteca</div>
+            <input id="searchBox" placeholder="Search flows...">
+        </div>
+    </div>
+
+    <div style="display:flex; gap:10px;">
+        <select id="langSelector">
+            <option value="en">English</option>
+            <option value="pt">Português</option>
+        </select>
+
+        <button id="darkModeToggle">Dark mode</button>
+    </div>
+</header>
+
+<div class="container" id="flowContainer">Loading...</div>
+
+<script>
+const LANG = {
+    en: {
+        search: "Search flows...",
+        folder: "Flow folder:",
+        description: "Description:",
+        notabs: "No tabs found.",
+        copy: "Copy",
+        copied: "Copied!",
+        dark: "Dark mode",
+        light: "Light mode",
+        comments: "Comments",
+        addComment: "Add Comment",
+        submit: "Submit",
+        cancel: "Cancel",
+        noComments: "No comments yet. Be the first to comment!",
+        anonymous: "Anonymous",
+        instructions: "Instructions",
+        showCode: "Show Code",
+        hideCode: "Hide Code",
+        showInstructions: "Show Instructions",
+        hideInstructions: "Hide Instructions",
+        namePlaceholder: "Name (optional)",
+        noInstructionsForTab: "No specific instructions for this tab."
+    },
+    pt: {
+        search: "Pesquisar fluxos...",
+        folder: "Pasta do fluxo:",
+        description: "Descrição:",
+        notabs: "Nenhum separador encontrado.",
+        copy: "Copiar",
+        copied: "Copiado!",
+        dark: "Modo escuro",
+        light: "Modo claro",
+        comments: "Comentários",
+        addComment: "Adicionar Comentário",
+        submit: "Enviar",
+        cancel: "Cancelar",
+        noComments: "Nenhum comentário ainda. Seja o primeiro a comentar!",
+        anonymous: "Anônimo",
+        instructions: "Instruções",
+        showCode: "Mostrar Código",
+        hideCode: "Ocultar Código",
+        showInstructions: "Mostrar Instruções",
+        hideInstructions: "Ocultar Instruções",
+        namePlaceholder: "Nome (opcional)",
+        noInstructionsForTab: "Nenhuma instrução específica para este separador."
+    }
+};
+
+// Comments management functions
+function getComments(flowId) {
+    const comments = localStorage.getItem(`flow_comments_${flowId}`);
+    return comments ? JSON.parse(comments) : [];
+}
+
+function saveComment(flowId, comment) {
+    const comments = getComments(flowId);
+    comments.push(comment);
+    localStorage.setItem(`flow_comments_${flowId}`, JSON.stringify(comments));
+    return comments;
+}
+
+function generateCommentId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+async function loadFlows() {
+    const resp = await fetch("flows.json");
+    return resp.json();
+}
+
+function createCommentsSection(flowId, lang) {
+    const commentsSection = document.createElement('div');
+    commentsSection.className = 'comments-section';
+    
+    // Comments header with count
+    const commentsHeader = document.createElement('div');
+    commentsHeader.className = 'comments-header';
+    
+    const commentsTitle = document.createElement('span');
+    commentsTitle.textContent = LANG[lang].comments;
+    
+    const addCommentBtn = document.createElement('button');
+    addCommentBtn.className = 'add-comment-btn';
+    addCommentBtn.textContent = LANG[lang].addComment;
+    
+    commentsHeader.appendChild(commentsTitle);
+    commentsHeader.appendChild(addCommentBtn);
+    
+    // Comment form (hidden by default)
+    const commentForm = document.createElement('div');
+    commentForm.className = 'comment-form';
+    
+    // New name input field
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.className = 'comment-name-input';
+    nameInput.placeholder = LANG[lang].namePlaceholder;
+
+    const commentInput = document.createElement('textarea');
+    commentInput.className = 'comment-input';
+    commentInput.placeholder = `${LANG[lang].addComment}...`;
+    
+    const formButtons = document.createElement('div');
+    
+    const submitBtn = document.createElement('button');
+    submitBtn.className = 'comment-submit';
+    submitBtn.textContent = LANG[lang].submit;
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'comment-cancel';
+    cancelBtn.textContent = LANG[lang].cancel;
+    
+    formButtons.appendChild(submitBtn);
+    formButtons.appendChild(cancelBtn);
+    
+    commentForm.appendChild(nameInput);
+    commentForm.appendChild(commentInput);
+    commentForm.appendChild(formButtons);
+    
+    // Comments list
+    const commentsList = document.createElement('div');
+    commentsList.className = 'comments-list';
+    
+    // Load existing comments
+    const comments = getComments(flowId);
+    updateCommentsCount(commentsTitle, comments.length, lang);
+    renderComments(commentsList, comments, lang);
+    
+    // Event handlers
+    addCommentBtn.addEventListener('click', () => {
+        commentForm.classList.toggle('active');
+        if (commentForm.classList.contains('active')) {
+            nameInput.focus();
+        }
+    });
+    
+    submitBtn.addEventListener('click', () => {
+        const text = commentInput.value.trim();
+        const authorName = nameInput.value.trim();
+        
+        if (text) {
+            const newComment = {
+                id: generateCommentId(),
+                text: text,
+                author: authorName || LANG[lang].anonymous,
+                date: new Date().toISOString()
+            };
+            
+            const updatedComments = saveComment(flowId, newComment);
+            renderComments(commentsList, updatedComments, lang);
+            updateCommentsCount(commentsTitle, updatedComments.length, lang);
+            
+            // Reset form
+            nameInput.value = '';
+            commentInput.value = '';
+            commentForm.classList.remove('active');
+        }
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+        nameInput.value = '';
+        commentInput.value = '';
+        commentForm.classList.remove('active');
+    });
+    
+    commentsSection.appendChild(commentsHeader);
+    commentsSection.appendChild(commentForm);
+    commentsSection.appendChild(commentsList);
+    
+    return commentsSection;
+}
+
+function updateCommentsCount(element, count, lang) {
+    element.textContent = `${LANG[lang].comments} (${count})`;
+}
+
+function renderComments(container, comments, lang) {
+    container.innerHTML = '';
+    
+    if (comments.length === 0) {
+        const noComments = document.createElement('div');
+        noComments.className = 'no-comments';
+        noComments.textContent = LANG[lang].noComments;
+        container.appendChild(noComments);
+        return;
+    }
+    
+    // Sort comments by date (newest first)
+    comments.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    comments.forEach(comment => {
+        const commentEl = document.createElement('div');
+        commentEl.className = 'comment';
+        
+        const commentHeader = document.createElement('div');
+        commentHeader.className = 'comment-header';
+        
+        const author = document.createElement('span');
+        author.className = 'comment-author';
+        author.textContent = comment.author || LANG[lang].anonymous;
+        
+        const date = document.createElement('span');
+        const commentDate = new Date(comment.date);
+        // Format with both date and time
+        const formattedDate = commentDate.toLocaleDateString() + ' ' + commentDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        date.textContent = formattedDate;
+        
+        commentHeader.appendChild(author);
+        commentHeader.appendChild(date);
+        
+        const commentText = document.createElement('div');
+        commentText.className = 'comment-text';
+        commentText.textContent = comment.text;
+        
+        commentEl.appendChild(commentHeader);
+        commentEl.appendChild(commentText);
+        container.appendChild(commentEl);
+    });
+}
+
+async function render() {
+    const lang = document.getElementById("langSelector").value;
+    const search = document.getElementById("searchBox").value.toLowerCase();
+    const flowContainer = document.getElementById("flowContainer");
+
+    document.getElementById("searchBox").placeholder = LANG[lang].search;
+    document.getElementById("darkModeToggle").textContent = 
+        document.body.classList.contains("dark") ? LANG[lang].light : LANG[lang].dark;
+
+    const flows = await loadFlows();
+    flowContainer.innerHTML = "";
+
+    flows
+        .filter(f => f.name.toLowerCase().includes(search))
+        .forEach(flow => {
+            const card = document.createElement("div");
+            card.className = "flow-card";
+
+            // Create a unique ID for this flow based on its name
+            const flowId = flow.name.replace(/\s+/g, '_').toLowerCase();
+
+            // *** ADAPTATION 1: Use the top-level flow description ***
+            // The original code was: const description = flow.tabs.length > 0 ? flow.tabs[0].description : "";
+            const description = flow.description || "";
+
+            card.innerHTML = `
+                <div class="flow-title">${flow.name}</div>
+                <div class="flow-desc"><b>${LANG[lang].description}</b> ${description}</div>
+            `;
+
+            if (!flow.tabs || flow.tabs.length === 0) {
+                card.innerHTML += `<div>${LANG[lang].notabs}</div>`;
+                flowContainer.appendChild(card);
+                return;
+            }
+
+            // *** ADAPTATION 2: Display flow-level instructions ***
+            // Check if the flow has instructions at the top level
+            const hasInstructions = flow.instructions && flow.instructions.trim() !== '';
+            let instructionsBtn, instructionsSection;
+
+            if (hasInstructions) {
+                // Add instructions button
+                instructionsBtn = document.createElement("button");
+                instructionsBtn.className = "instructions-btn";
+                instructionsBtn.textContent = LANG[lang].showInstructions;
+                
+                // Instructions section (hidden by default)
+                instructionsSection = document.createElement("div");
+                instructionsSection.className = "instructions-section";
+                
+                const instructionsHeader = document.createElement("div");
+                instructionsHeader.className = "instructions-header";
+                instructionsHeader.textContent = LANG[lang].instructions;
+                
+                const instructionsContent = document.createElement("div");
+                instructionsContent.className = "instructions-content";
+                // Set the content to the flow's instructions
+                instructionsContent.textContent = flow.instructions;
+                
+                instructionsSection.appendChild(instructionsHeader);
+                instructionsSection.appendChild(instructionsContent);
+                
+                // Toggle instructions visibility
+                instructionsBtn.addEventListener("click", () => {
+                    instructionsSection.classList.toggle("active");
+                    instructionsBtn.textContent = instructionsSection.classList.contains("active") 
+                        ? LANG[lang].hideInstructions 
+                        : LANG[lang].showInstructions;
+                });
+                
+                card.appendChild(instructionsBtn);
+                card.appendChild(instructionsSection);
+            }
+
+            const tabsDiv = document.createElement("div");
+            tabsDiv.className = "tabs";
+            
+            // Create code container with toggle button
+            const codeContainer = document.createElement("div");
+            codeContainer.className = "code-container";
+            
+            const codeHeader = document.createElement("div");
+            codeHeader.className = "code-header";
+            
+            const codeToggleBtn = document.createElement("button");
+            codeToggleBtn.className = "code-toggle-btn";
+            codeToggleBtn.textContent = LANG[lang].showCode;
+            
+            codeHeader.appendChild(codeToggleBtn);
+            codeContainer.appendChild(codeHeader);
+            
+            const pre = document.createElement("pre");
+
+            flow.tabs.forEach((tab, index) => {
+                const tabBtn = document.createElement("div");
+                tabBtn.className = "tab";
+                tabBtn.textContent = tab.tabName;
+
+                tabBtn.onclick = async () => {
+                    [...tabsDiv.children].forEach(b => b.classList.remove("active"));
+                    tabBtn.classList.add("active");
+                    const text = await fetch(tab.file).then(r => r.text());
+                    pre.textContent = text;
+
+                    // *** ADAPTATION 2 (continued): Removed tab-specific instruction update logic ***
+                    // The instructions are now for the whole flow, so we don't need to update them on tab click.
+                };
+
+                if (index === 0) {
+                    tabBtn.classList.add("active");
+                    fetch(tab.file).then(r => r.text()).then(t => pre.textContent = t);
+                }
+
+                tabsDiv.appendChild(tabBtn);
+            });
+
+            // Toggle code visibility
+            codeToggleBtn.addEventListener("click", () => {
+                pre.classList.toggle("expanded");
+                codeToggleBtn.textContent = pre.classList.contains("expanded") 
+                    ? LANG[lang].hideCode 
+                    : LANG[lang].showCode;
+            });
+
+            const copyBtn = document.createElement("button");
+            copyBtn.className = "copy-btn";
+            copyBtn.textContent = LANG[lang].copy;
+
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(pre.textContent);
+                copyBtn.textContent = LANG[lang].copied;
+                setTimeout(() => copyBtn.textContent = LANG[lang].copy, 1500);
+            };
+
+            card.appendChild(tabsDiv);
+            codeContainer.appendChild(pre);
+            codeContainer.appendChild(copyBtn);
+            card.appendChild(codeContainer);
+            
+            // Add comments section
+            const commentsSection = createCommentsSection(flowId, lang);
+            card.appendChild(commentsSection);
+
+            flowContainer.appendChild(card);
+        });
+}
+
+document.getElementById("searchBox").oninput = render;
+document.getElementById("langSelector").onchange = render;
+
+document.getElementById("darkModeToggle").onclick = () => {
+    document.body.classList.toggle("dark");
+    render();
+};
+
+render();
+</script>
+
+</body>
+</html>
